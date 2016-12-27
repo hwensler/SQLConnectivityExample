@@ -1,0 +1,194 @@
+/*
+Drop commands for all tables
+*/
+
+DROP TABLE IF EXISTS APPLICANT;
+DROP TABLE IF EXISTS EDUCATION;
+DROP TABLE IF EXISTS EMPLOYMENT;
+DROP TABLE IF EXISTS APP_VETERAN;
+DROP TABLE IF EXISTS APP_ETHNICITY;
+DROP TABLE IF EXISTS APP_TEST;
+DROP TABLE IF EXISTS APP_STATUS;
+DROP TABLE IF EXISTS APPLICATION;
+DROP TABLE IF EXISTS TERM;
+DROP TABLE IF EXISTS DEGREE_TYPE;
+DROP TABLE IF EXISTS STUDENT_TYPE;
+DROP TABLE IF EXISTS MAJOR;
+DROP TABLE IF EXISTS COLLEGE;
+DROP TABLE IF EXISTS VETERAN;
+DROP TABLE IF EXISTS ETHNICITY;
+DROP TABLE IF EXISTS TESTS;
+DROP TABLE IF EXISTS USER;
+DROP TABLE IF EXISTS STATE;
+
+CREATE TABLE IF NOT EXISTS USER(
+	User_ID INT NOT NULL AUTO_INCREMENT,
+	Username varchar(64) NOT NULL UNIQUE,
+	Password varchar(64) NOT NULL,
+	PRIMARY KEY (User_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS APPLICANT(
+	Applicant_ID INT NOT NULL AUTO_INCREMENT,
+	Application_ID INT NOT NULL,
+	Applicant_FName varchar(32) NOT NULL,
+	Applicant_LName varchar(32) NOT NULL,
+	Preferred_FName varchar(32),
+	Preferred_LName varchar(32),
+	Date_of_Birth date NOT NULL,
+	Street varchar(40) NOT NULL,
+	City varchar(64) NOT NULL,
+	State varchar(2) NOT NULL,
+	Country varchar(64) NOT NULL,
+	Postal_Code varchar(16) NOT NULL,
+	Preferred_Phone varchar(16) NOT NULL,
+	US_Citizen boolean NOT NULL,
+	English_Native_Lang boolean NOT NULL,
+	Gender ENUM('Male', 'Female', 'Other') NOT NULL,
+	Offer_Accepted varchar(16),
+	PRIMARY KEY (Applicant_ID),
+	FOREIGN KEY (Application_ID) REFERENCES APPLICATION(Application_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS TERM(
+	Term_ID INT NOT NULL AUTO_INCREMENT,
+	Term varchar(16) NOT NULL UNIQUE,
+	PRIMARY KEY (Term_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS DEGREE_TYPE(
+	Deg_Type_ID INT NOT NULL AUTO_INCREMENT,
+	Degree_Type varchar(32) NOT NULL UNIQUE,
+	PRIMARY KEY (Deg_Type_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS STUDENT_TYPE(
+	Stu_Type_ID INT NOT NULL AUTO_INCREMENT,
+	Student_Type varchar(32) NOT NULL UNIQUE,
+	PRIMARY KEY (Stu_Type_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS MAJOR(
+	Major_ID INT NOT NULL AUTO_INCREMENT,
+	Major varchar(64) NOT NULL UNIQUE,
+	PRIMARY KEY (Major_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS COLLEGE(
+	College_ID INT NOT NULL AUTO_INCREMENT,
+	College varchar(64) NOT NULL UNIQUE,
+	PRIMARY KEY (College_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS APPLICATION(
+	Application_ID INT NOT NULL AUTO_INCREMENT,
+	User_ID INT NOT NULL,
+	App_Date date NOT NULL,
+	Term_ID INT NOT NULL,
+	Deg_Type_ID INT NOT NULL,
+	Stu_Type_ID INT NOT NULL,
+	College_ID INT NOT NULL,
+	Major_ID INT NOT NULL,
+	Financial_Aid boolean NOT NULL,
+	Emp_Tuit_Asst boolean NOT NULL,
+	Other_Programs boolean NOT NULL,
+	Convicted_Felon boolean NOT NULL,
+	Higher_Ed_Sanction boolean NOT NULL,
+	PRIMARY KEY (Application_ID),
+	FOREIGN KEY (User_ID) REFERENCES USER(User_ID),
+	FOREIGN KEY (Term_ID) REFERENCES TERM(Term_ID),
+	FOREIGN KEY (Deg_Type_ID) REFERENCES DEGREE_TYPE(Deg_Type_ID),
+	FOREIGN KEY (Stu_Type_ID) REFERENCES STUDENT_TYPE(Stu_Type_ID),
+	FOREIGN KEY (College_ID) REFERENCES COLLEGE(College_ID),
+	FOREIGN KEY (Major_ID) REFERENCES MAJOR(Major_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS APP_STATUS(
+	Application_ID INT NOT NULL,
+	Status varchar(16) NOT NULL,
+	PRIMARY KEY (Application_ID),
+	FOREIGN KEY (Application_ID) REFERENCES APPLICATION(Application_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS TESTS(
+	Test_ID INT NOT NULL AUTO_INCREMENT,
+	Test_Type varchar(8) NOT NULL UNIQUE,
+	PRIMARY KEY (Test_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS APP_TEST(
+	Application_ID INT NOT NULL,
+	Test_ID INT NOT NULL,
+	Test_Date date NOT NULL,
+	Test_Score INT NOT NULL,
+	PRIMARY KEY (Application_ID, Test_ID),
+	FOREIGN KEY (Application_ID) REFERENCES APPLICATION(Application_ID),
+	FOREIGN KEY (Test_ID) REFERENCES TESTS(Test_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS ETHNICITY(
+	Ethnicity_ID INT NOT NULL AUTO_INCREMENT,
+	Ethnicity varchar(32) NOT NULL UNIQUE,
+	PRIMARY KEY (Ethnicity_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS APP_ETHNICITY(
+	Application_ID INT NOT NULL,
+	Ethnicity_ID INT NOT NULL,
+	PRIMARY KEY (Application_ID, Ethnicity_ID),
+	FOREIGN KEY (Application_ID) REFERENCES APPLICATION(Application_ID),
+	FOREIGN KEY (Ethnicity_ID) REFERENCES ETHNICITY(Ethnicity_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS VETERAN(
+	Veteran_ID INT NOT NULL AUTO_INCREMENT,
+	Military_Branch varchar(16) NOT NULL uNIQUE,
+	PRIMARY KEY (Veteran_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS APP_VETERAN(
+	Application_ID INT NOT NULL,
+	Veteran_ID INT NOT NULL,
+	Vet_Status varchar(32) NOT NULL,
+	PRIMARY KEY (Application_ID, Veteran_ID),
+	FOREIGN KEY (Application_ID) REFERENCES APPLICATION(Application_ID),
+	FOREIGN KEY (Veteran_ID) REFERENCES VETERAN(Veteran_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS EDUCATION(
+	Education_ID INT NOT NULL AUTO_INCREMENT,
+	Application_ID INT NOT NULL,
+	Institution_Name varchar(64) NOT NULL,
+	Ed_Start_Date date NOT NULL,
+	Ed_End_Date date,
+	Degree_Earned varchar(32) NOT NULL,
+	Major varchar(32) NOT NULL,
+	Degree_Receive_Date date,
+	PRIMARY KEY (Education_ID),
+	FOREIGN KEY (Application_ID) REFERENCES APPLICATION(Application_ID)) ENGINE=innodb;
+
+CREATE TABLE IF NOT EXISTS EMPLOYMENT(
+	Employer_ID INT NOT NULL AUTO_INCREMENT,
+	Application_ID INT NOT NULL,
+	Employer_Name varchar(64) NOT NULL,
+	Currently_Employed_By boolean NOT NULL,
+	Street varchar(40) NOT NULL,
+	City varchar(64) NOT NULL,
+	State varchar(2) NOT NULL,
+	Country varchar(32) NOT NULL,
+	Postal_Code varchar(16) NOT NULL,
+	Phone_Num varchar(16) NOT NULL,
+	Job_Title varchar(64) NOT NULL,
+	Emp_Start_Date date NOT NULL,
+	Emp_End_Date date,
+	Part_Full_Time ENUM('Part', 'Full') NOT NULL,
+	PRIMARY KEY (Employer_ID),
+	FOREIGN KEY (Application_ID) REFERENCES APPLICATION(Application_ID)) ENGINE=innodb;
+
+
+CREATE TABLE IF NOT EXISTS STATE(
+	State char(2) NOT NULL PRIMARY KEY) ENGINE=innodb;
+
+INSERT INTO STATE VALUES('AL'), ('AK'), ('AS'), ('AZ'), ('AR'), ('CA'), ('CO'), ('CT'), ('DE'), ('DC'), ('FL'), ('GA'), ('GU'), ('HI'), ('ID'), ('IL'), ('IN'), ('IA'), ('KS'), ('KY'), ('LA'), ('ME'), ('MD'), ('MA'), ('MI'), ('MN'), ('MS'), ('MO'), ('MT'), ('NE'), ('NV'), ('NH'), ('NJ'), ('NM'), ('NY'), ('NC'), ('ND'), ('OH'), ('OK'), ('OR'), ('PA'), ('PR'), ('RI'), ('SC'), ('SD'), ('TN'), ('TX'), ('UT'), ('VT'), ('VA'), ('WA'), ('WV'), ('WI'), ('WY');
+
+
+INSERT INTO TERM values(0, 'Fall 2016'), (0, 'Summer 2017'), (0, 'Fall 2017');
+
+INSERT INTO DEGREE_TYPE values(0, 'Certificates'), (0, 'Masters');
+
+INSERT INTO STUDENT_TYPE values(0, 'Graduate'), (0, 'Graduate Non-Matriculated'), (0, 'Graduate Readmission');
+
+INSERT INTO MAJOR values(0, 'Certificate in Computer Science Fundamentals'), (0, 'Certificate in Software Architecture and Design'), (0, 'Certificate in Software Project Management');
+
+INSERT INTO COLLEGE values(0, 'College of Science and Engineering'), (0, 'Albers School of Business'), (0, 'College of Arts and Science'), (0, 'College of Education'), (0, 'College of Nursing'), (0, 'School of Theology and Ministry');
+
+INSERT INTO ETHNICITY values(0, 'Asian'), (0, 'Black/African American'), (0, 'Hispanic/Latino'), (0, 'Native Hawaiian/Pacific Islander'), (0, 'Native American/Native Indian'), (0, 'White/Middle Eastern');
+
+INSERT INTO VETERAN values(0, 'Air Force'), (0, 'Army'), (0, 'Marine Corp'), (0, 'Navy'), (0, 'Coast Guard');
+
+INSERT INTO TESTS values(0, 'CBEST'), (0, 'GMAT'), (0, 'GRE General'), (0, 'IELTS'), (0, 'MAT'), (0, 'PRAXIS'), (0, 'TOEFL'), (0, 'WEST-B'), (0, 'WEST-E');
